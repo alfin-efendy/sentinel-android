@@ -1,0 +1,26 @@
+name: android-validation
+description: Validate architecture and implementation consistency
+
+triggers:
+  - manual
+  - pre_commit
+
+actions:
+  - type: check_structure
+    expected:
+      - service/accessibility
+      - core/relaunch
+      - data/config
+
+  - type: check_patterns
+    required:
+      - debounce_pattern
+      - service_separation
+
+  - type: check_anti_patterns
+    forbidden:
+      - infinite_loop
+      - blocking_accessibility_thread
+
+  - type: report
+    format: summary

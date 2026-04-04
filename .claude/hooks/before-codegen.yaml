@@ -1,0 +1,28 @@
+name: before-codegen
+description: Prepare context before generating Android code
+
+triggers:
+  - code_generation_requested
+
+actions:
+  - type: inject_context
+    content: |
+      You are working on an Android app with:
+      - AccessibilityService for app monitoring
+      - ForegroundService for persistence
+
+      Always:
+      - Use Kotlin
+      - Follow clean architecture
+      - Avoid memory leaks
+      - Avoid blocking main thread
+
+  - type: enforce_rules
+    rules:
+      - must_use_flag_activity_new_task
+      - must_include_debounce_logic
+      - must_handle_permissions
+
+  - type: attach_skills
+    skills:
+      - android-accessibility-monitor

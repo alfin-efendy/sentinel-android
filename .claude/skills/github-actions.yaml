@@ -1,0 +1,143 @@
+name: github-actions-android
+description: Generate and manage GitHub Actions workflows for Android projects (build, test, lint, and artifact generation)
+
+capabilities:
+  - generate_workflow
+  - setup_android_ci
+  - build_apk
+  - run_lint
+  - run_unit_tests
+  - upload_artifacts
+  - manage_workflow_triggers
+
+context:
+  platform: android
+  ci: github_actions
+  language: kotlin
+  constraints:
+    - must_use_latest_stable_actions
+    - must_cache_gradle_dependencies
+    - must_support_pull_request_and_push
+    - must_be_fast_and_reliable
+
+knowledge:
+  core_components:
+    - GitHub Actions workflow YAML
+    - actions/checkout
+    - actions/setup-java
+    - gradle build system
+    - upload-artifact
+
+  patterns:
+    - gradle_cache_pattern
+    - multi-step_build
+    - ci_pipeline_structure
+    - artifact_upload_pattern
+
+  anti_patterns:
+    - no_caching
+    - hardcoded_paths
+    - missing_java_setup
+    - running_unnecessary_tasks
+
+tasks:
+  - name: generate_basic_ci
+    description: Create a basic Android CI workflow
+
+  - name: add_build_step
+    description: Add Gradle build step
+
+  - name: add_lint_step
+    description: Add Android lint check
+
+  - name: add_test_step
+    description: Add unit test execution
+
+  - name: upload_apk
+    description: Upload APK as artifact
+
+rules:
+  - always use Java 17
+  - always cache Gradle dependencies
+  - always run ./gradlew build
+  - separate steps clearly
+  - use ubuntu-latest runner
+
+templates:
+
+  android_ci_workflow:
+    content: |
+      name: Android CI
+
+      on:
+        push:
+          branches: [ "main" ]
+        pull_request:
+          branches: [ "main" ]
+
+      jobs:
+        build:
+          runs-on: ubuntu-latest
+
+          steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup JDK 17
+              uses: actions/setup-java@v4
+              with:
+                distribution: temurin
+                java-version: 17
+                cache: gradle
+
+            - name: Grant execute permission for Gradlew
+              run: chmod +x ./gradlew
+
+            - name: Build project
+              run: ./gradlew build
+
+            - name: Run Lint
+              run: ./gradlew lint
+
+            - name: Run Unit Tests
+              run: ./gradlew test
+
+            - name: Build Debug APK
+              run: ./gradlew assembleDebug
+
+            - name: Upload APK
+              uses: actions/upload-artifact@v4
+              with:
+                name: app-debug-apk
+                path: app/build/outputs/apk/debug/app-debug.apk
+
+  fast_ci:
+    content: |
+      name: Fast CI
+
+      on:
+        pull_request:
+
+      jobs:
+        quick-check:
+          runs-on: ubuntu-latest
+
+          steps:
+            - uses: actions/checkout@v4
+
+            - uses: actions/setup-java@v4
+              with:
+                distribution: temurin
+                java-version: 17
+                cache: gradle
+
+            - run: chmod +x ./gradlew
+            - run: ./gradlew lint test
+
+evaluation:
+  success_criteria:
+    - workflow runs successfully on push
+    - APK artifact is generated
+    - lint passes without errors
+    - tests execute correctly
+    - build time is optimized with caching

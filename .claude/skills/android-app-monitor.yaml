@@ -1,0 +1,76 @@
+name: android-app-monitor
+description: Build and maintain an Android app monitoring and auto relaunch system using accessibility service, and foreground service
+
+capabilities:
+  - generate_android_kotlin_code
+  - implement_accessibility_service
+  - manage_foreground_service
+  - handle_android_permissions
+  - implement_deeplink_navigation
+  - debug_background_execution
+  - optimize_android_performance
+
+context:
+  platform: android
+  language: kotlin
+  architecture: service-based
+  constraints:
+    - not_for_play_store
+    - requires_accessibility_service
+
+knowledge:
+  core_components:
+    - AccessibilityService
+    - ForegroundService
+    - Intent & Deep Link
+    - PackageManager
+
+  patterns:
+    - debounce_relaunch
+    - service_lifecycle_management
+    - foreground_detection
+
+  anti_patterns:
+    - infinite_relaunch_loop
+    - blocking_main_thread
+    - blocking_accessibility_thread
+
+tasks:
+  - name: create_monitor_service
+    description: Generate an AccessibilityService to monitor foreground app changes
+
+  - name: relaunch_app
+    description: Safely launch target app via package name or deep link
+
+  - name: manage_permissions
+    description: Guide user to enable required permissions accessibility
+
+  - name: prevent_loop
+    description: Implement debounce logic to prevent infinite relaunch loops
+
+rules:
+  - always use FLAG_ACTIVITY_NEW_TASK when launching apps
+  - never block AccessibilityService thread
+  - always debounce relaunch logic
+  - separate UI logic from service logic
+  - use ForegroundService for persistence
+
+examples:
+
+  relaunch_intent:
+    code: |
+      val intent = packageManager.getLaunchIntentForPackage(packageName)
+      intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      startActivity(intent)
+
+  debounce_logic:
+    code: |
+      val now = System.currentTimeMillis()
+      if (now - lastLaunchTime < 2000) return
+
+evaluation:
+  success_criteria:
+    - foreground app detection works reliably
+    - app relaunch triggers correctly
+    - no infinite relaunch loop occurs
+    - service survives background execution

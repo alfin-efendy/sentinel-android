@@ -1,0 +1,130 @@
+name: documentation-readme
+description: Generate and maintain high-quality README.md documentation for Android projects
+
+capabilities:
+  - generate_readme
+  - update_readme
+  - structure_documentation
+  - write_markdown
+  - summarize_project
+  - create_usage_guides
+
+context:
+  platform: android
+  output: markdown
+  file: README.md
+  constraints:
+    - must_be_clear_and_concise
+    - must_be_structured
+    - must_be_readable_for_developers
+    - must_not_include_sensitive_data
+
+knowledge:
+  sections:
+    - title
+    - description
+    - features
+    - architecture
+    - installation
+    - usage
+    - permissions
+    - configuration
+    - development
+    - troubleshooting
+    - roadmap
+    - license
+
+  patterns:
+    - markdown_best_practices
+    - developer_friendly_format
+    - step_by_step_instructions
+    - code_snippet_usage
+    - section_consistency
+
+  anti_patterns:
+    - missing_sections
+    - overly_long_paragraphs
+    - no_code_examples
+    - unclear_instructions
+    - inconsistent_formatting
+
+tasks:
+  - name: generate_full_readme
+    description: Create a complete README.md from project context
+
+  - name: update_existing_readme
+    description: Improve or extend an existing README.md
+
+  - name: add_section
+    description: Add a specific section (e.g., installation, usage)
+
+  - name: summarize_project
+    description: Write a clear project overview
+
+  - name: generate_usage_guide
+    description: Provide step-by-step instructions for using the app
+
+rules:
+  - always include a project title
+  - always include a clear description
+  - always include installation steps
+  - always include usage instructions
+  - always include permissions explanation
+  - use markdown headings consistently
+  - use bullet points for readability
+  - include code blocks where necessary
+
+templates:
+
+  basic_structure:
+    content: |
+      # Project Name
+
+      ## Description
+      Short explanation of the project.
+
+      ## Features
+      - Feature 1
+      - Feature 2
+
+      ## Installation
+      Steps to install the project.
+
+      ## Usage
+      How to use the app.
+
+      ## Permissions
+      Required permissions and why they are needed.
+
+      ## Development
+      How to run and develop the project.
+
+      ## License
+      License information.
+
+  android_permissions:
+    content: |
+      ## Permissions
+
+      This app requires the following permissions:
+
+      - `FOREGROUND_SERVICE` — to keep monitoring active
+      - `BIND_ACCESSIBILITY_SERVICE` — to detect foreground app changes
+
+  usage_example:
+    content: |
+      ## Usage
+
+      1. Open the app
+      2. Select target application
+      3. Input deep link (optional)
+      4. Tap **Start**
+      5. Grant required permissions
+
+evaluation:
+  success_criteria:
+    - README is complete and structured
+    - easy to understand for new developers
+    - includes all required sections
+    - includes clear setup instructions
+    - uses clean markdown formatting

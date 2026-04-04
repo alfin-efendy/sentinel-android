@@ -1,0 +1,100 @@
+name: android-accessibility-monitor
+description: Monitor foreground app changes using AccessibilityService and trigger actions based on app state
+
+capabilities:
+  - implement_accessibility_service
+  - detect_foreground_app
+  - monitor_window_state_changes
+  - trigger_background_actions
+  - integrate_with_services
+  - optimize_event_handling
+
+context:
+  platform: android
+  language: kotlin
+  component: accessibility
+  constraints:
+    - requires_user_enabled_accessibility_service
+    - must_not_block_accessibility_thread
+    - must_handle_high_frequency_events
+    - must_be_lightweight
+
+knowledge:
+  core_components:
+    - AccessibilityService
+    - AccessibilityEvent
+    - TYPE_WINDOW_STATE_CHANGED
+    - packageName
+    - event filtering
+
+  patterns:
+    - foreground_app_detection
+    - debounce_event_handling
+    - service_to_service_communication
+    - event_filtering_pattern
+
+  anti_patterns:
+    - heavy_logic_in_onAccessibilityEvent
+    - no_debounce_logic
+    - blocking_thread
+    - reacting_to_all_events_without_filter
+
+tasks:
+  - name: create_accessibility_service
+    description: Implement AccessibilityService to listen for app changes
+
+  - name: detect_foreground_app
+    description: Extract current foreground app package name from events
+
+  - name: compare_target_app
+    description: Compare current app with target app
+
+  - name: trigger_relaunch
+    description: Trigger relaunch logic when target app is not active
+
+  - name: debounce_events
+    description: Prevent rapid repeated triggers
+
+rules:
+  - always filter for TYPE_WINDOW_STATE_CHANGED
+  - always debounce relaunch logic
+  - never block onAccessibilityEvent
+  - keep logic minimal inside event handler
+  - delegate heavy work to background service
+
+examples:
+
+  basic_service:
+    code: |
+      class AppMonitorService : AccessibilityService() {
+          override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+              if (event?.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+                  val packageName = event.packageName?.toString()
+              }
+          }
+
+          override fun onInterrupt() {}
+      }
+
+  debounce_logic:
+    code: |
+      val now = System.currentTimeMillis()
+      if (now - lastTriggerTime < 2000) return
+
+  trigger_action:
+    code: |
+      if (currentApp != targetApp) {
+          relaunchApp()
+      }
+
+  event_filter:
+    code: |
+      if (event?.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
+
+evaluation:
+  success_criteria:
+    - correctly detects foreground app changes
+    - triggers relaunch only when needed
+    - no excessive event spam
+    - no performance degradation
+    - works continuously in background

@@ -1,0 +1,21 @@
+name: after-codegen
+description: Validate generated Android code
+
+triggers:
+  - code_generated
+
+actions:
+  - type: validate_code
+    checks:
+      - no_infinite_loop
+      - has_debounce_logic
+      - no_blocking_main_thread
+      - proper_service_usage
+
+  - type: suggest_improvements
+    hints:
+      - add_null_safety
+      - improve_lifecycle_handling
+
+  - type: auto_fix
+    enabled: false

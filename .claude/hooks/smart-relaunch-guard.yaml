@@ -1,0 +1,23 @@
+name: smart-relaunch-guard
+description: Prevent aggressive app relaunch loops
+
+triggers:
+  - relaunch_logic_detected
+
+actions:
+  - type: enforce_pattern
+    pattern: debounce
+
+  - type: inject_code
+    snippet: |
+      val now = System.currentTimeMillis()
+      if (now - lastLaunchTime < 2000) return
+
+  - type: warn_if_missing
+    message: "Relaunch logic must include debounce to prevent infinite loop"
+
+  - type: suggest
+    content: |
+      Consider adding:
+      - user intent detection
+      - grace period after manual exit

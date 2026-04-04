@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Sentinel</string>
+    <string name="accessibility_service_label">Sentinel App Monitor</string>
+    <string name="accessibility_service_description">Sentinel uses the Accessibility Service to detect when the monitored app is no longer in the foreground, enabling automatic relaunch.</string>
+</resources>
