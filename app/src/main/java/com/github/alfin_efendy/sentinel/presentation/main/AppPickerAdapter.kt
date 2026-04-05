@@ -1,7 +1,9 @@
 package com.github.alfin_efendy.sentinel.presentation.main
 
+import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -21,19 +23,21 @@ class AppPickerAdapter(
         val old = selectedPackage
         selectedPackage = packageName
         if (old != packageName) {
-            // Refresh affected items
-            currentList.indexOfFirst { it.packageName == old }.takeIf { it >= 0 }?.let { notifyItemChanged(it) }
-            currentList.indexOfFirst { it.packageName == packageName }.takeIf { it >= 0 }?.let { notifyItemChanged(it) }
+            currentList.indexOfFirst { it.packageName == old }
+                .takeIf { it >= 0 }?.let { notifyItemChanged(it) }
+            currentList.indexOfFirst { it.packageName == packageName }
+                .takeIf { it >= 0 }?.let { notifyItemChanged(it) }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val row = LinearLayout(parent.context).apply {
+        val ctx = parent.context
+        fun Int.dp() = (this * ctx.resources.displayMetrics.density).toInt()
+
+        val row = LinearLayout(ctx).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            val dp16 = (16 * resources.displayMetrics.density).toInt()
-            val dp8 = (8 * resources.displayMetrics.density).toInt()
-            setPadding(dp16, dp8, dp16, dp8)
+            setPadding(20.dp(), 12.dp(), 20.dp(), 12.dp())
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -51,41 +55,71 @@ class AppPickerAdapter(
         private val iconView: ImageView
         private val nameView: TextView
         private val pkgView: TextView
+        private val checkView: TextView
 
         init {
-            val dp8 = (8 * row.resources.displayMetrics.density).toInt()
-            val dp40 = (40 * row.resources.displayMetrics.density).toInt()
+            val ctx = row.context
+            fun Int.dp() = (this * ctx.resources.displayMetrics.density).toInt()
 
-            iconView = ImageView(row.context).apply {
-                layoutParams = LinearLayout.LayoutParams(dp40, dp40).apply {
-                    setMargins(0, 0, dp8, 0)
+            iconView = ImageView(ctx).apply {
+                layoutParams = LinearLayout.LayoutParams(44.dp(), 44.dp()).apply {
+                    setMargins(0, 0, 14.dp(), 0)
                 }
                 scaleType = ImageView.ScaleType.FIT_CENTER
+                background = GradientDrawable().apply {
+                    setColor(Color.parseColor("#F1F5F9"))
+                    cornerRadius = 10.dp().toFloat()
+                }
+                setPadding(6.dp(), 6.dp(), 6.dp(), 6.dp())
             }
             row.addView(iconView)
 
-            val textCol = LinearLayout(row.context).apply {
+            val textCol = LinearLayout(ctx).apply {
                 orientation = LinearLayout.VERTICAL
-                layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                layoutParams = LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f
+                )
             }
-            nameView = TextView(row.context).apply { textSize = 15f }
-            pkgView = TextView(row.context).apply {
+            nameView = TextView(ctx).apply {
+                textSize = 15f
+                setTextColor(Color.parseColor("#1E293B"))
+                typeface = Typeface.DEFAULT_BOLD
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.END
+            }
+            pkgView = TextView(ctx).apply {
                 textSize = 11f
-                setTextColor(android.graphics.Color.GRAY)
+                setTextColor(Color.parseColor("#94A3B8"))
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.END
             }
             textCol.addView(nameView)
             textCol.addView(pkgView)
             row.addView(textCol)
+
+            checkView = TextView(ctx).apply {
+                text = "✓"
+                textSize = 16f
+                setTextColor(Color.parseColor("#6366F1"))
+                typeface = Typeface.DEFAULT_BOLD
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply { setMargins(12.dp(), 0, 0, 0) }
+                visibility = android.view.View.GONE
+            }
+            row.addView(checkView)
         }
 
         fun bind(app: AppInfo, selectedPackage: String, onSelected: (AppInfo) -> Unit) {
             iconView.setImageDrawable(app.icon)
             nameView.text = app.label
             pkgView.text = app.packageName
+
             val isSelected = app.packageName == selectedPackage
+            checkView.visibility = if (isSelected) android.view.View.VISIBLE else android.view.View.GONE
             row.setBackgroundColor(
-                if (isSelected) android.graphics.Color.parseColor("#E8F5E9")
-                else android.graphics.Color.TRANSPARENT
+                if (isSelected) Color.parseColor("#EEF2FF") else Color.TRANSPARENT
             )
             row.setOnClickListener { onSelected(app) }
         }
@@ -94,7 +128,8 @@ class AppPickerAdapter(
     companion object {
         private val DIFF = object : DiffUtil.ItemCallback<AppInfo>() {
             override fun areItemsTheSame(a: AppInfo, b: AppInfo) = a.packageName == b.packageName
-            override fun areContentsTheSame(a: AppInfo, b: AppInfo) = a.packageName == b.packageName && a.label == b.label
+            override fun areContentsTheSame(a: AppInfo, b: AppInfo) =
+                a.packageName == b.packageName && a.label == b.label
         }
     }
 }

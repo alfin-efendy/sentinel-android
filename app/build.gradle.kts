@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
