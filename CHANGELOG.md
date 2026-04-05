@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/alfin-efendy/sentinel-android/compare/v1.2.0...v1.2.1) (2026-04-05)
+
+
+### Bug Fixes
+
+* update semantic release step to detect new tags correctly ([6826e5d](https://github.com/alfin-efendy/sentinel-android/commit/6826e5d2e5ef710b19c907db7263e0dc5543df36))
+
 # [1.2.0](https://github.com/alfin-efendy/sentinel-android/compare/v1.1.1...v1.2.0) (2026-04-05)
 
 
