@@ -105,11 +105,35 @@ jobs:
       - name: Build release APK
         run: ./gradlew assembleRelease --stacktrace
 
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > keystore.jks
+
+      - name: Sign APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          VERSION="${{ needs.release.outputs.new-release-version }}"
+          UNSIGNED="app/build/outputs/apk/release/app-release-unsigned.apk"
+          SIGNED="sentinel-${VERSION}.apk"
+          # Use the latest available apksigner from the Android SDK
+          APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name "apksigner" | sort -V | tail -1)
+          "$APKSIGNER" sign \
+            --ks keystore.jks \
+            --ks-pass "pass:${KEYSTORE_PASSWORD}" \
+            --ks-key-alias "${KEY_ALIAS}" \
+            --key-pass "pass:${KEYSTORE_PASSWORD}" \
+            --out "$SIGNED" \
+            "$UNSIGNED"
+          # Verify the signature
+          "$APKSIGNER" verify "$SIGNED"
+
       - name: Upload APK to GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ needs.release.outputs.new-release-version }}"
           gh release upload "v${VERSION}" \
-            app/build/outputs/apk/release/app-release-unsigned.apk \
+            "sentinel-${VERSION}.apk" \
             --clobber
