@@ -51,7 +51,6 @@ jobs:
             @semantic-release/git@10
 
       - name: Run Semantic Release
-        id: semantic
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIT_AUTHOR_NAME: github-actions[bot]
@@ -59,6 +58,21 @@ jobs:
           GIT_COMMITTER_NAME: github-actions[bot]
           GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
         run: npx semantic-release
+
+      # npx semantic-release does not write to $GITHUB_OUTPUT automatically.
+      # Detect the new tag by comparing git tags before and after the run.
+      - name: Detect new release
+        id: semantic
+        run: |
+          git fetch --tags
+          NEW_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1 || echo "")
+          if [ -n "$NEW_TAG" ]; then
+            echo "new_release_published=true"       >> "$GITHUB_OUTPUT"
+            echo "new_release_version=${NEW_TAG#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "new_release_published=false" >> "$GITHUB_OUTPUT"
+            echo "new_release_version="        >> "$GITHUB_OUTPUT"
+          fi
 
   # ── Stage 2: Build & upload release APK ──────────────────────────────────────
   build-release-apk:
