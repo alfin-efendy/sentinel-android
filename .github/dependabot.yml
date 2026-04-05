@@ -1,0 +1,57 @@
+version: 2
+
+updates:
+  # Gradle dependencies
+  - package-ecosystem: gradle
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "04:00"
+      timezone: Asia/Jakarta
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - android
+    commit-message:
+      prefix: "build"
+      include: scope
+    groups:
+      kotlin-ecosystem:
+        patterns:
+          - "org.jetbrains.kotlin*"
+          - "org.jetbrains.kotlinx*"
+      androidx:
+        patterns:
+          - "androidx.*"
+      testing:
+        patterns:
+          - "junit*"
+          - "io.mockk*"
+          - "app.cash.turbine*"
+          - "org.robolectric*"
+    ignore:
+      # Renovate already handles patch updates — avoid duplicate PRs
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-patch"
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "04:00"
+      timezone: Asia/Jakarta
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - ci
+    commit-message:
+      prefix: "ci"
+      include: scope
+    groups:
+      github-actions-all:
+        patterns:
+          - "*"
