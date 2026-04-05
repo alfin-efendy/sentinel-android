@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/alfin-efendy/sentinel-android/compare/v1.0.0...v1.1.0) (2026-04-05)
+
+
+### Features
+
+* update CI/CD workflows to trigger releases after successful CI completion ([05ea562](https://github.com/alfin-efendy/sentinel-android/commit/05ea562879c99342437bea30f55a81ee12abc334))
+
 # 1.0.0 (2026-04-05)
 
 
