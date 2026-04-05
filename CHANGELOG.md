@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/alfin-efendy/sentinel-android/compare/v1.2.1...v1.2.2) (2026-04-05)
+
+
+### Bug Fixes
+
+* add keystore decoding and APK signing steps in CI workflow ([73092f7](https://github.com/alfin-efendy/sentinel-android/commit/73092f725ad06947cc023ed3fd2c10297e3a8758))
+
 ## [1.2.1](https://github.com/alfin-efendy/sentinel-android/compare/v1.2.0...v1.2.1) (2026-04-05)
 
 
