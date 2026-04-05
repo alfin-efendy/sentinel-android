@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/alfin-efendy/sentinel-android/compare/v1.1.0...v1.1.1) (2026-04-05)
+
+
+### Bug Fixes
+
+* update CD workflow to use GITHUB_TOKEN for checkout and set author info for semantic release ([91e811b](https://github.com/alfin-efendy/sentinel-android/commit/91e811b81b3f61384adfef442b31313bc1c90d3c))
+
 # [1.1.0](https://github.com/alfin-efendy/sentinel-android/compare/v1.0.0...v1.1.0) (2026-04-05)
 
 
