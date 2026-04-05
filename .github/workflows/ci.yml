@@ -26,6 +26,9 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
       - name: Copy CI Gradle properties
         run: cp .github/ci-gradle.properties gradle.properties
 
@@ -101,6 +104,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
       - name: Copy CI Gradle properties
         run: cp .github/ci-gradle.properties gradle.properties
