@@ -18,10 +18,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
@@ -33,14 +33,14 @@ jobs:
         run: cp .github/ci-gradle.properties gradle.properties
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest --stacktrace
 
       - name: Upload unit test report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: unit-test-results
           path: app/build/reports/tests/testDebugUnitTest/
@@ -50,7 +50,7 @@ jobs:
 
       - name: Upload lint report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: lint-report
           path: app/build/reports/lint-results-debug.html
@@ -59,7 +59,7 @@ jobs:
         run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload debug APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
@@ -99,10 +99,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
@@ -114,7 +114,7 @@ jobs:
         run: cp .github/ci-gradle.properties gradle.properties
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Enable KVM hardware acceleration
         run: |
@@ -135,7 +135,7 @@ jobs:
 
       - name: Upload instrumented test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: instrumented-test-results-api-${{ matrix.api-level }}
           path: app/build/reports/androidTests/connected/
