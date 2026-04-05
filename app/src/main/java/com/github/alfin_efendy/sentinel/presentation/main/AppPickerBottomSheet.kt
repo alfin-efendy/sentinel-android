@@ -30,11 +30,19 @@ class AppPickerBottomSheet : BottomSheetDialogFragment() {
 
     override fun onStart() {
         super.onStart()
-        // Make the container transparent so rounded top corners are visible
-        val sheet = dialog?.findViewById<FrameLayout>(
+        val d = dialog ?: return
+
+        // Remove the dialog window's own background (outermost layer)
+        d.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Color.TRANSPARENT))
+
+        val sheet = d.findViewById<FrameLayout>(
             com.google.android.material.R.id.design_bottom_sheet
         ) ?: return
-        sheet.setBackgroundColor(Color.TRANSPARENT)
+
+        // Null out backgrounds at every level so only our rounded card is visible
+        sheet.background = null
+        (sheet.parent as? ViewGroup)?.background = null
+
         BottomSheetBehavior.from(sheet).apply {
             state = BottomSheetBehavior.STATE_EXPANDED
             skipCollapsed = true
@@ -54,18 +62,18 @@ class AppPickerBottomSheet : BottomSheetDialogFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Clear search query when bottom sheet is dismissed
         viewModel.setSearchQuery("")
     }
 
     private fun buildContent(): View {
         val ctx = requireContext()
+        val cs = colorScheme()
         fun Int.dp() = (this * ctx.resources.displayMetrics.density).toInt()
 
         val root = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
             background = GradientDrawable().apply {
-                setColor(Color.WHITE)
+                setColor(Color.parseColor(cs.surface))
                 cornerRadii = floatArrayOf(
                     24.dp().toFloat(), 24.dp().toFloat(),
                     24.dp().toFloat(), 24.dp().toFloat(),
@@ -82,7 +90,7 @@ class AppPickerBottomSheet : BottomSheetDialogFragment() {
             )
             addView(View(ctx).apply {
                 background = GradientDrawable().apply {
-                    setColor(Color.parseColor("#CBD5E1"))
+                    setColor(Color.parseColor(cs.handle))
                     cornerRadius = 3.dp().toFloat()
                 }
                 layoutParams = FrameLayout.LayoutParams(40.dp(), 4.dp()).apply {
@@ -96,7 +104,7 @@ class AppPickerBottomSheet : BottomSheetDialogFragment() {
             text = "Select Application"
             textSize = 18f
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#1E293B"))
+            setTextColor(Color.parseColor(cs.textPrimary))
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -108,7 +116,7 @@ class AppPickerBottomSheet : BottomSheetDialogFragment() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             background = GradientDrawable().apply {
-                setColor(Color.parseColor("#F1F5F9"))
+                setColor(Color.parseColor(cs.inputBg))
                 cornerRadius = 12.dp().toFloat()
             }
             setPadding(14.dp(), 0, 14.dp(), 0)
@@ -120,14 +128,14 @@ class AppPickerBottomSheet : BottomSheetDialogFragment() {
             addView(TextView(ctx).apply {
                 text = "⌕"
                 textSize = 18f
-                setTextColor(Color.parseColor("#94A3B8"))
+                setTextColor(Color.parseColor(cs.textHint))
                 setPadding(0, 0, 8.dp(), 0)
             })
             addView(EditText(ctx).apply {
                 hint = "Search apps..."
                 textSize = 14f
-                setTextColor(Color.parseColor("#1E293B"))
-                setHintTextColor(Color.parseColor("#94A3B8"))
+                setTextColor(Color.parseColor(cs.textPrimary))
+                setHintTextColor(Color.parseColor(cs.textHint))
                 background = null
                 setSingleLine(true)
                 layoutParams = LinearLayout.LayoutParams(
@@ -144,7 +152,7 @@ class AppPickerBottomSheet : BottomSheetDialogFragment() {
 
         // Thin divider
         root.addView(View(ctx).apply {
-            setBackgroundColor(Color.parseColor("#F1F5F9"))
+            setBackgroundColor(Color.parseColor(cs.divider))
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, 1.dp()
             )
@@ -177,6 +185,37 @@ class AppPickerBottomSheet : BottomSheetDialogFragment() {
             viewModel.config.collectLatest { adapter.setSelected(it.packageName) }
         }
     }
+
+    private fun isDarkMode(): Boolean {
+        val flags = resources.configuration.uiMode and
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        return flags == android.content.res.Configuration.UI_MODE_NIGHT_YES
+    }
+
+    private fun colorScheme(): ColorScheme = if (isDarkMode()) ColorScheme(
+        surface     = "#1E293B",
+        textPrimary = "#F1F5F9",
+        textHint    = "#475569",
+        inputBg     = "#0F172A",
+        divider     = "#334155",
+        handle      = "#334155",
+    ) else ColorScheme(
+        surface     = "#FFFFFF",
+        textPrimary = "#1E293B",
+        textHint    = "#94A3B8",
+        inputBg     = "#F1F5F9",
+        divider     = "#F1F5F9",
+        handle      = "#CBD5E1",
+    )
+
+    private data class ColorScheme(
+        val surface: String,
+        val textPrimary: String,
+        val textHint: String,
+        val inputBg: String,
+        val divider: String,
+        val handle: String,
+    )
 
     companion object {
         const val TAG = "AppPickerBottomSheet"

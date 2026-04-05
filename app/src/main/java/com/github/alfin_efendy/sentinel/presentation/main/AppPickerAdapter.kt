@@ -1,10 +1,13 @@
 package com.github.alfin_efendy.sentinel.presentation.main
 
+import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -52,27 +55,34 @@ class AppPickerAdapter(
 
     class ViewHolder(private val row: LinearLayout) : RecyclerView.ViewHolder(row) {
 
+        private val ctx: Context get() = row.context
         private val iconView: ImageView
+        private val iconContainer: FrameLayout
         private val nameView: TextView
         private val pkgView: TextView
         private val checkView: TextView
 
         init {
-            val ctx = row.context
             fun Int.dp() = (this * ctx.resources.displayMetrics.density).toInt()
 
-            iconView = ImageView(ctx).apply {
+            iconContainer = FrameLayout(ctx).apply {
                 layoutParams = LinearLayout.LayoutParams(44.dp(), 44.dp()).apply {
                     setMargins(0, 0, 14.dp(), 0)
                 }
-                scaleType = ImageView.ScaleType.FIT_CENTER
                 background = GradientDrawable().apply {
                     setColor(Color.parseColor("#F1F5F9"))
                     cornerRadius = 10.dp().toFloat()
                 }
-                setPadding(6.dp(), 6.dp(), 6.dp(), 6.dp())
             }
-            row.addView(iconView)
+            iconView = ImageView(ctx).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    28.dp(), 28.dp()
+                ).apply { gravity = Gravity.CENTER }
+                scaleType = ImageView.ScaleType.FIT_CENTER
+                setPadding(0, 0, 0, 0)
+            }
+            iconContainer.addView(iconView)
+            row.addView(iconContainer)
 
             val textCol = LinearLayout(ctx).apply {
                 orientation = LinearLayout.VERTICAL
@@ -105,24 +115,67 @@ class AppPickerAdapter(
                 layoutParams = LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply { setMargins(12.dp(), 0, 0, 0) }
+                ).apply {
+                    fun Int.dp() = (this * ctx.resources.displayMetrics.density).toInt()
+                    setMargins(12.dp(), 0, 0, 0)
+                }
                 visibility = android.view.View.GONE
             }
             row.addView(checkView)
         }
 
         fun bind(app: AppInfo, selectedPackage: String, onSelected: (AppInfo) -> Unit) {
+            fun Int.dp() = (this * ctx.resources.displayMetrics.density).toInt()
+            val cs = colorScheme()
+
             iconView.setImageDrawable(app.icon)
             nameView.text = app.label
+            nameView.setTextColor(Color.parseColor(cs.textPrimary))
             pkgView.text = app.packageName
+            pkgView.setTextColor(Color.parseColor(cs.textHint))
+
+            // Icon container background
+            (iconContainer.background as? GradientDrawable)
+                ?.setColor(Color.parseColor(cs.iconBg))
 
             val isSelected = app.packageName == selectedPackage
             checkView.visibility = if (isSelected) android.view.View.VISIBLE else android.view.View.GONE
             row.setBackgroundColor(
-                if (isSelected) Color.parseColor("#EEF2FF") else Color.TRANSPARENT
+                if (isSelected) Color.parseColor(cs.selectedBg) else Color.TRANSPARENT
             )
+            // Checkmark tint adapts to primary color
+            checkView.setTextColor(Color.parseColor(cs.primary))
+
             row.setOnClickListener { onSelected(app) }
         }
+
+        private fun isDarkMode(): Boolean {
+            val flags = ctx.resources.configuration.uiMode and
+                    Configuration.UI_MODE_NIGHT_MASK
+            return flags == Configuration.UI_MODE_NIGHT_YES
+        }
+
+        private fun colorScheme(): ColorScheme = if (isDarkMode()) ColorScheme(
+            textPrimary = "#F1F5F9",
+            textHint    = "#64748B",
+            iconBg      = "#0F172A",
+            selectedBg  = "#1E1B4B",
+            primary     = "#818CF8",
+        ) else ColorScheme(
+            textPrimary = "#1E293B",
+            textHint    = "#94A3B8",
+            iconBg      = "#F1F5F9",
+            selectedBg  = "#EEF2FF",
+            primary     = "#6366F1",
+        )
+
+        private data class ColorScheme(
+            val textPrimary: String,
+            val textHint: String,
+            val iconBg: String,
+            val selectedBg: String,
+            val primary: String,
+        )
     }
 
     companion object {
