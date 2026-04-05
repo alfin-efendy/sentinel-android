@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/alfin-efendy/sentinel-android/compare/v1.1.1...v1.2.0) (2026-04-05)
+
+
+### Features
+
+* enhance UI/UX with AppPicker and improved layouts ([1cd8d31](https://github.com/alfin-efendy/sentinel-android/commit/1cd8d3117130ebf68e4460933bbd48019107baf4))
+
 ## [1.1.1](https://github.com/alfin-efendy/sentinel-android/compare/v1.1.0...v1.1.1) (2026-04-05)
 
 
