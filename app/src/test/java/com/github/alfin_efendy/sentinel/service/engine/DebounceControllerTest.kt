@@ -17,7 +17,7 @@ class DebounceControllerTest {
         val controller = DebounceController(this)
         var ran = false
         controller.schedule(100L) { ran = true }
-        advanceTimeBy(100L)
+        advanceTimeBy(101L) // exclusive: tasks at exactly +100ms need +1ms extra
         assertTrue(ran)
     }
 
@@ -48,7 +48,7 @@ class DebounceControllerTest {
         controller.schedule(100L) { actionA = true }
         advanceTimeBy(50L)
         controller.schedule(100L) { actionB = true }
-        advanceTimeBy(100L)
+        advanceTimeBy(101L) // exclusive: tasks at exactly +100ms need +1ms extra
         assertFalse(actionA)
         assertTrue(actionB)
     }

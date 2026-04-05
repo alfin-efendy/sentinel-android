@@ -2,10 +2,14 @@ package com.github.alfin_efendy.sentinel.core
 
 import app.cash.turbine.test
 import com.github.alfin_efendy.sentinel.domain.model.ForegroundEvent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+
+@OptIn(ExperimentalCoroutinesApi::class)
 
 class AppEventBusTest {
 
@@ -44,9 +48,11 @@ class AppEventBusTest {
         val job1 = launch { AppEventBus.events.collect { received1.add(it) } }
         val job2 = launch { AppEventBus.events.collect { received2.add(it) } }
 
+        // Let collectors actually start and suspend waiting for events
+        runCurrent()
         AppEventBus.tryEmit(event)
-        // Give coroutines time to collect
-        testScheduler.advanceUntilIdle()
+        // Let collectors process the event
+        runCurrent()
 
         job1.cancel()
         job2.cancel()
