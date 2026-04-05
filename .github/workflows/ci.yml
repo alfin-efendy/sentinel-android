@@ -65,9 +65,11 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
 
   # ── Stage 2: Instrumented tests on Android emulators ─────────────────────────
+  # Only runs on push to main — skipped on pull_request (pre-merge)
   instrumented-tests:
     name: Instrumented Tests (API ${{ matrix.api-level }})
     needs: unit-test-and-build
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

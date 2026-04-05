@@ -1,7 +1,12 @@
 name: CD
 
+# Triggered only after CI workflow completes successfully on main.
+# This ensures all jobs (unit tests + all emulator matrix) have passed
+# before a release is attempted.
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
     branches: [main]
 
 permissions:
@@ -14,8 +19,10 @@ jobs:
   release:
     name: Semantic Release
     runs-on: ubuntu-latest
-    # Skip if commit message contains [skip ci] (e.g. the release commit itself)
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    # Only run when CI passed AND the triggering commit is not a release commit
+    if: |
+      github.event.workflow_run.conclusion == 'success' &&
+      !contains(github.event.workflow_run.head_commit.message, '[skip ci]')
     outputs:
       new-release-published: ${{ steps.semantic.outputs.new_release_published }}
       new-release-version: ${{ steps.semantic.outputs.new_release_version }}
@@ -24,6 +31,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -67,6 +75,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
       - name: Copy CI Gradle properties
         run: cp .github/ci-gradle.properties gradle.properties
